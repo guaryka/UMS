@@ -1,0 +1,48 @@
+.contain {
+    height: 90vh;
+    width: 100%;
+    display: flex;
+}
+
+#LeftPannel {
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    width: 30%;
+}
+
+#RightPannel {
+    height: 90vh;
+    width: 100%;
+}
+
+#userList {
+    height: 300px;
+    width: 300px;
+    display: block;
+}
+
+#usersTable {
+    width: 100%;
+    height: auto;
+}
+
+#cuccung {
+    height: 50px;
+}
+
+
+.btn {
+    height: 40px;
+    width: 90px;
+    font-size: 12px;
+    margin: 5px;
+}
+
+table {
+    font-size: 14px;
+}  
+#html1{
+    margin-top: 100px;
+}
+

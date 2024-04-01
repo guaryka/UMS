@@ -1,0 +1,901 @@
+﻿@{
+    ViewData["Title"] = "Quan Ly Nhan Vien";
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>JsTree Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <link href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css" rel="stylesheet" />
+    <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+    <style>
+        * {
+            padding: 0px;
+            margin: 0px;
+            font-size: 12px;
+        }
+
+        .contain {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+        }
+
+        #LeftPannel {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 30%;
+        }
+        #html1{
+            height:50vh;
+        }
+
+        #RightPannel {
+            height: 100vh;
+            width: 100%;
+        }
+        #userList {
+            height: 300px;
+            width: 300px;
+            display: block;
+        }
+        #usersTable {
+            width: 100%;
+            height: auto;
+        }
+        #cuccung{
+            height:50px;
+        }
+
+        .modal-backdrop {
+            z-index: 1050;
+        }
+
+        .select2-container {
+            z-index: 1060;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="contain">
+        <div id="LeftPannel">            
+            <div id="cuccung">
+                <div class="nutbam" style="display:none" id="nutbam">
+                    <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#CreateGroup">
+                        Create
+                    </button>
+                    <button type="button" class="btn btn-warning btn-lg" data-bs-toggle="modal" data-bs-target="#EditGroup">
+                        Edit
+                    </button>
+                    <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                        Delete
+                    </button>
+                    <button type="button" class="btn btn-info btn-lg" data-bs-toggle="modal" data-bs-target="#GroupDetails">
+                        Details
+                    </button>
+
+                </div>
+
+            </div>
+            
+            <div id="html1"></div>
+            <p id="event_result"></p>
+            
+            @*Tạo nhóm*@
+            <div class="modal" id="CreateGroup">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Create Group</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form onsubmit="event.preventDefault();">
+                                <div class="form-group">
+                                    <label>Tên nhóm</label>
+                                    <input type="text" class="form-control valName" id="tenNhom" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Mã nhóm</label>
+                                    <input type="text" class="form-control valCode" id="CodeNhom" required>
+                                </div>
+                                <div class="form-group">
+                                    <label style="display:block">Nhóm Cha</label>
+                                    <input type="text" class="form-control" id="NhomCha" style="display:block" >
+                                </div>
+                                <div class="form-group">
+                                    <label style="display:block">Số thứ tự</label>
+                                    <input type="text" class="form-control valStt" id="STTNhom" style="display:block" required>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger btn-lg" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary btn-lg" id="SubCreGroup">Submit</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            @*Edit Nhóm*@
+                <div class="modal" id="EditGroup">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Edit group</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form  onsubmit="event.preventDefault();">
+                                    <div class="form-group">
+                                        <label style="display:none">Id nhóm</label>
+                                        <input type="text" class="form-control" style="display:none" id="groupId">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tên nhóm</label>
+                                        <input type="text" class="form-control" id="groupName">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Mã nhóm</label>
+                                        <input type="text" class="form-control" id="groupCode">
+                                    </div>  
+                                    <div class="form-group">
+                                        <label>Số thứ tự</label>
+                                        <input type="text" class="form-control" id="groupStt">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nhóm cha</label>
+                                        <input type="text" class="form-control" id="parentId" readonly>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger btn-lg" data-bs-dismiss="modal">Close</button>
+                                <button type="button" onclick="CapNhatNhom()" class="btn btn-primary btn-lg">Submit</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            
+            @*Xem chi tiết*@
+            <div class="modal" id="GroupDetails">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Details</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form id="XemChiTiet" onsubmit="event.preventDefault();">
+                                <div class="form-group">
+                                    <label>Mã nhóm</label>
+                                    <input type="text" class="form-control" id="Code" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tên Nhóm</label>
+                                    <input type="text" class="form-control" id="Name" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Số thứ tự</label>
+                                    <input type="text" class="form-control" id="GroupSTT" readonly>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger btn-lg" data-bs-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>   
+            @* Xóa nhóm. *@
+            <div class="modal" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Delete Group</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            Bạn có muốn xóa nhóm không ?
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger btn-lg" onclick="deleteGroup()">Submit</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="RightPannel" style="display:none">
+            <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#UserCreate">
+                Đăng kí 
+            </button>
+            <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" id="delGUbutton" data-bs-target="#deleteGroupUser">
+                Xóa nhiều
+            </button>
+            <table id="myTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th class="text-center"><input type="checkbox" class="selectAll" name="selectAll" value="all"></th>
+                        <th>STT</th>
+                        <th>Họ và tên</th>
+                        <th>Tài khoản</th>
+                        <th>Ngày sinh</th>
+                        <th>Giới tính</th>
+                        <th>Sđt</th>
+                        <th>Email</th>
+                        <th>Vai trò</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>      
+                </tbody>
+            </table>
+            <div class="modal" id="UserCreate">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Create new User</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form onsubmit="event.preventDefault();">
+                                <div>
+                                    <label for="HoVaTen">Họ và tên</label>
+                                    <input type="text" class="form-control valNameUser" id="FullName" name="FullName" required>
+                                </div>
+                                <div>
+                                    <label for="TaiKhoan">Tài khoản</label>
+                                    <input type="text" class="form-control valUserName" id="UserName" name="UserName" required>
+                                </div>
+                                <div>
+                                    <label for="NgaySinh">Ngày sinh</label>
+                                    <input type="date" class="form-control" id="Date" name="Date" required>
+                                </div>
+                                <div>
+                                    <label for="Gender">Giới tính</label>
+                                    <select id="Gender" class="form-control" required>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select><br>
+                                </div>
+                                <div>
+                                    <label for="SDT">Số điện thoại</label>
+                                    <input type="text" class="form-control valSdt" id="Number" name="Number" required>
+                                </div>
+                                <div>
+                                    <label for="email">Email:</label>
+                                    <input type="email" class="form-control valEmail" id="Email" name="Email" required>
+                                </div>
+                                <label for="hihi">Select2 in Modal:</label>
+                                <select class="form-control select2 modal-select2" id="hihi">
+                                </select>
+                                <div>
+                                    <label for="STT">Số thứ tự</label>
+                                    <input type="number" class="form-control valSttUser" id="STT" name="Email" required>
+                                </div>
+                                <div>
+                                    <label for="MaNhom" style="display: none;">Id Nhóm</label>
+                                    <input type="text" id="GroupId" name="GroupId" style="display: none;" required>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger btn-lg" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary btn-lg" id="SubUserCre">Submit</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>  
+            <div class="modal" id="edit-user-form">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Modal Heading</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <div>
+                                <h3>Edit User</h3>
+                                <form onsubmit="event.preventDefault();">
+                                    <label for="edit-username">Username:</label>
+                                    <input type="text" class="form-control" id="edit-username" name="UserName" required><br>
+                                    <label for="edit-fullname">Full Name:</label>
+                                    <input type="text" class="form-control" id="edit-fullname" name="FullName" required><br>
+                                    <label for="edit-date">Date of Birth:</label>
+                                    <input type="date" class="form-control" id="edit-date" name="Date" required><br>
+                                    <label for="edit-gender">Gender:</label>
+                                    <select id="edit-gender" class="form-control" req   uired>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select><br>
+                                    <label for="edit-number">Phone:</label>
+                                    <input type="text" class="form-control" id="edit-number" name="Number" required><br>
+                                    <label for="edit-email">Email:</label>
+                                    <input type="email" class="form-control" id="edit-email" name="Email" required><br>
+                                    <input type="number" id="edit-id" name="Id" style="display: none;" readonly>
+                                    <label for="edit-role">Vai trò</label>
+                                    <select class="form-control select2" id="edit-role"></select>
+                                    <label for="edit-stt">Số thứ tự</label>
+                                    <input type="number" class="form-control" id="edit-stt" required>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="CapNhatNguoiDung()">Save</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal" id="deleteUser" data-bs-backdrop="static" data-bs-keyboard="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Delete User</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            Bạn có muốn xóa người dùng này không ?
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger btn-lg" id="delete_button">Submit</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal" id="deleteGroupUser" data-bs-backdrop="static" data-bs-keyboard="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Delete Group User</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            Bạn có muốn xóa nhóm người dùng này không ?
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger btn-lg" id="deleteGroup_button">Submit</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="container mt-3 ">
+                <div class="toast position-fixed top-0 end-0" id="toast1">
+                    <div class="toast-header">
+                        <strong class="me-auto">Thông báo</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        <p>Tạo người dùng mới thành công </p>
+                    </div>
+                </div>
+                <div class="toast position-fixed top-0 end-0" id="toast2">
+                    <div class="toast-header">
+                        <strong class="me-auto">Thông báo</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        <p>Xóa người dùng thành công</p>
+                    </div>
+                </div>
+                <div class="toast position-fixed top-0 end-0" id="toast3">
+                    <div class="toast-header">
+                        <strong class="me-auto">Thông báo</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        <p>Cập nhật người dùng thành công</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script> 
+        
+        function validateName(){
+            if ($(".valName").val() == "") {
+                return true;
+            } else return false;
+        }
+        $('#SubCreGroup').on('click', function () {
+            if($(".valName").val() == ""){
+                alert("Tên chưa điền");
+            } else if($(".valCode").val() == ""){
+                alert("Code chưa điền")
+            }else if($(".valStt").val() == ""){
+                alert("Stt chưa điền")
+            }
+            else{ LuuForm(); }
+        });
+        $('#SubUserCre').on('click', function () {
+            if ($(".valNameUser").val() == "") {
+                alert("Tên chưa điền");
+            } else if ($(".valUserName").val() == "") {
+                alert("Username chưa điền");
+            }else if ($(".valSdt").val() == "") {
+                alert("Số điện thoại chưa điền");
+            } else if ($(".valEmail").val() == "") {
+                alert("Email chưa điền");
+            }else if ($(".valSttUser").val() == "") {
+                alert("Stt chưa điền");
+            }
+            else { DangKiNguoiDung(); }
+        });
+        var data = [
+            {
+                id: 1,
+                text: 'Giám đốc'
+            },
+            {
+                id: 2,
+                text: 'Trưởng phòng'
+            },
+            {
+                id: 3,
+                text: 'Nhân viên'
+            },
+        ];
+        $('#edit-user-form').on('shown.bs.modal', function () {
+                    $('#edit-role').select2({
+                        data: data,
+                    });   
+                });
+        $('#UserCreate').on('shown.bs.modal', function () {
+            $('.select2.modal-select2').select2({
+                data: data,
+            });
+        });
+        
+        $(function () {
+            $('#html1').jstree({
+                'core': {
+                    'data': {
+                        'url': '/Home/Nodes',
+                    }
+                }
+            });
+            $('#html1').on('select_node.jstree', hihi);
+            async function hihi(e, data) {
+                document.getElementById('nutbam').style.display = "block";
+                document.getElementById('RightPannel').style.display = "block";
+                document.getElementById('NhomCha').value = data.node.id;
+                $('#parentId').val(data.node.parent);
+                var a = data.node.id;
+                await DataTablehihi(a);
+                try {
+                    const response = await fetch(`/Group/Details/GroupId/${data.node.id}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    });
+                    const respondedata = await response.json();
+                    console.log(respondedata);
+                    $('#groupName').val(respondedata[0].name);
+                    $('#groupCode').val(respondedata[0].code);
+                    $('#Name').val(respondedata[0].name);
+                    $('#Code').val(respondedata[0].code);
+                    $('#groupId').val(respondedata[0].id);
+                    $('#GroupId').val(respondedata[0].id);
+                    $('#GroupSTT').val(respondedata[0].stt);
+                    $('#groupStt').val(respondedata[0].stt);
+                } catch (error) {
+                    console.log('lỗi:', error);
+                }
+            }
+        });
+        //Tạo nhóm mới.
+        async function LuuForm() {
+            var modal = document.getElementById('CreateGroup');
+            var bootstrapModal = bootstrap.Modal.getInstance(modal);
+            if (bootstrapModal !== null) {
+                bootstrapModal.hide();
+            }
+            var tennhom = $('#tenNhom').val();
+            var nhomcha = $('#NhomCha').val();
+            var manhom = $('#CodeNhom').val();
+            var stt = $('#STTNhom').val();
+            try {
+                const response = await fetch('/Group/CreateGroup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        Name: tennhom,
+                        Code: manhom,
+                        Parent_Id: nhomcha,
+                        STT: stt
+                    })
+                });
+                const data = await response.json();
+                await $('#html1').jstree('refresh');
+                console.log('nhóm đã được tạo:', data);
+            } catch (error) {
+                console.log('lỗi:', error);
+            }
+        }
+        //Chỉnh sửa nhóm.
+        async function CapNhatNhom() {
+            var modal = document.getElementById('EditGroup');
+            var bootstrapModal = bootstrap.Modal.getInstance(modal);
+            bootstrapModal.hide();
+            var tenNhom = $('#groupName').val();
+            var IdNhom = $('#groupCode').val();
+            var Id = Number($('#groupId').val());
+            var stt = $('#groupStt').val();
+            var parent = $('#parentId').val();
+            try {
+                const response = await fetch('/Group/UpdateGroup', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        Name: tenNhom,
+                        Code: IdNhom,
+                        GroupId: Id,
+                        STT: stt,
+                        Parent_Id: parent,
+                    })
+                });
+                const data = await response.json();
+                console.log(data);
+                await $('#html1').jstree('refresh');
+
+                console.log('nhóm đã được sửa:', data);
+            } catch (error) {
+                console.log('lỗi:', error);
+            }
+        }
+        //Xóa nhóm.
+        async function deleteGroup() {
+            var modal = document.getElementById('staticBackdrop');
+            var bootstrapModal = bootstrap.Modal.getInstance(modal);
+            bootstrapModal.hide();
+            var GroupId = Number($('#groupId').val());
+            try {
+                const response = await fetch(`/Group/DeleteGroup/GroupId/${GroupId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('nhóm đã được xóa', data);
+                } else {
+                    console.log('Không thể xóa nhóm');
+                }
+            } catch (error) {
+                console.log('lỗi:', error);
+            }
+            $('#html1').jstree('refresh');
+        }
+        var DT4;
+        function DataTablehihi(a) {
+            $("#myTable").DataTable().destroy();
+            DT4 = $("#myTable").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ordering": true,
+                "ajax": {
+                    "url": "@Url.Action("GetData","User")?GroupId=" + a,
+                    "type": "POST",
+                    "datatype": "json",
+                },
+                "select":{
+                    style: 'multi',
+                    selector: 'td:first-child',
+                },
+                "columnDefs": [
+                    {   
+                        targets: 0,
+                        data: null,
+                        defaultContent: '',
+                        orderable: false,
+                        className: 'select-checkbox',
+                    },             
+                    {
+                        targets: 1,
+                        data: 'stt',
+                    },
+                    {
+                        targets: 2,
+                        data: 'fullname',
+                        render: function (data, type, row, meta) {
+                            return row.fullname;
+                        },
+
+                    },
+                    {
+                        targets: 3,
+                        data: 'username',
+
+                    },
+                    {
+                        targets: 4,
+                        data: 'date',
+                        render: function (data, type, row, meta) {
+                            var date = new Date(data);
+                            var day = date.getDate();
+                            var month = date.getMonth() + 1; // Tháng bắt đầu từ 0
+                            var year = date.getFullYear();
+                            var formattedDate = day + "/" + month + "/" + year;
+                            return formattedDate;
+                        },
+
+                    },
+                    {
+                        targets: 5,
+                        data: 'gender',
+                    },
+                    {
+                        targets: 6,
+                        data: 'number',
+
+                    },
+                    {
+                        targets: 7,
+                        data: 'email',
+
+                    },
+                    {
+                        targets: 8,
+                        data: 'roleName',
+
+                    },
+                    {
+                        targets: 9,
+                        data: null,
+                        render: function (data, type, row, meta) {
+                            return '<button type="button" class="edit-button btn btn-warning" data-bs-toggle="modal" data-bs-target="#edit-user-form">Chỉnh sửa</button>' +
+                                '<button type="button" class="delete-button btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUser">Xóa</button>';
+                        },
+                    }
+                ]
+            });
+            x
+            $('#myTable').on('click', '.delete-button', function () {
+                var data = $('#myTable').DataTable().row($(this).closest('tr')).data();
+                $('#edit-id').val(data.id);
+            }); 
+            $('#myTable').on('click', '.selectAll', function (e) {
+                if ($(this).is(":checked")) {
+                    DT4.rows().select();
+                } else {
+                    DT4.rows().deselect();
+                }
+                var selectedRows = DT4.rows({ selected: true }).data();
+                var selectedIds = selectedRows.map(function (row) {
+                    return row.id; 
+                });
+                console.log("Selected IDs:", selectedIds);
+            });
+        }; 
+        $('#delete_button').on('click', function () {
+            var e = $('#edit-id').val();
+            DeleteUser(e);
+        });
+        $('#deleteGroup_button').on('click', function () {
+            var selectedRows = Array.from(DT4.rows({ selected: true }).data());
+
+            selectedRows.forEach(function (row) {
+                DeleteGroupUser(row.id);
+            });
+        });
+        async function DeleteGroupUser(e) {
+            var currentPage = $("#myTable").DataTable().page();
+            var pageLength = $("#myTable").DataTable().page.len();
+            var modal = document.getElementById('deleteGroupUser');
+            var bootstrapModal = bootstrap.Modal.getInstance(modal);
+            bootstrapModal.hide();
+            var a = $('#NhomCha').val();
+            try {
+                const response = await fetch('/User/DeleteUser', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        Id: e,
+                    })
+                });
+                const responsedata = await response.json();
+                if (response.ok) {
+                    $("#myTable").DataTable().page(currentPage).page.len(pageLength).draw(false);
+                }
+                var myToast = document.getElementById('toast2');
+                var toast = new bootstrap.Toast(myToast);
+                toast.show();
+            } catch (error) {
+                console.log('lỗi:', error);
+            }
+        };
+        async function DeleteUser(e) {
+            var currentPage = $("#myTable").DataTable().page();
+            var pageLength = $("#myTable").DataTable().page.len();
+            var modal = document.getElementById('deleteUser');
+            var bootstrapModal = bootstrap.Modal.getInstance(modal);
+            bootstrapModal.hide();
+            var a = $('#NhomCha').val();
+            try {
+                const response = await fetch('/User/DeleteUser', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        Id: e,
+                    })
+                });
+                const responsedata = await response.json();
+                if (response.ok) {
+                    $("#myTable").DataTable().page(currentPage).page.len(pageLength).draw(false);
+                }
+                var myToast = document.getElementById('toast2');
+                var toast = new bootstrap.Toast(myToast);
+                toast.show();
+            } catch (error) {
+                console.log('lỗi:', error);
+            }
+        };
+
+        //Đăng kí người dùng.
+        async function DangKiNguoiDung() {
+            var currentPage = $("#myTable").DataTable().page();
+            var pageLength = $("#myTable").DataTable().page.len();
+            var myToast = document.getElementById('toast1');
+            var toast = new bootstrap.Toast(myToast);
+            var modal = document.getElementById('UserCreate');
+            var bootstrapModal = bootstrap.Modal.getInstance(modal);
+            // Lấy thông tin người dùng từ form
+            var HoVaTen = $('#FullName').val();
+            var TaiKhoan = $('#UserName').val();
+            var NgaySinh = $('#Date').val();
+            var GioiTinh = document.getElementById('Gender').value;
+            var SDT = $('#Number').val();
+            var email = $('#Email').val();
+            var GroupId = $('#GroupId').val();
+            var role = $('#hihi').val();
+            var stt = $('#STT').val();
+            try {
+                const response = await fetch('/User/CreateUser', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        FullName: HoVaTen,
+                        UserName: TaiKhoan,
+                        Date: NgaySinh,
+                        Gender: GioiTinh,
+                        Number: SDT,
+                        Email: email,
+                        GroupId: GroupId,
+                        RoleId: role,
+                        STT: stt,
+                    })
+                });
+                const responsedata = await response.json();
+                if (response.ok) {
+                    $("#myTable").DataTable().page(currentPage).page.len(pageLength).draw(false);
+                }
+                bootstrapModal.hide();
+                await toast.show();
+            } catch (error) {
+                console.log('lỗi:', error);
+            }
+        }
+        //Chỉnh sửa người dùng.
+        async function CapNhatNguoiDung() {
+            var currentPage = $("#myTable").DataTable().page();
+            var pageLength = $("#myTable").DataTable().page.len();
+            var myToast = document.getElementById('toast3');
+            var modal = document.getElementById('edit-user-form');
+            var bootstrapModal = bootstrap.Modal.getInstance(modal);
+            var toast = new bootstrap.Toast(myToast);
+            var Fullname = $('#edit-fullname').val();
+            var Username = $('#edit-username').val();
+            var date = $('#edit-date').val();
+            var Gender = $('#edit-gender').val();
+            var Number = $('#edit-number').val();
+            var Email = $('#edit-email').val();
+            var id = $('#edit-id').val();
+            var stt = $('#edit-stt').val();
+            var role = $('#edit-role').val();
+            var GroupId = $('#GroupId').val();
+            try {
+                const response = await fetch('/User/UpdateUser', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        FullName: Fullname,
+                        UserName: Username,
+                        Date: date,
+                        Gender: Gender,
+                        Number: Number,
+                        Email: Email,
+                        GroupId: GroupId,
+                        Id: id,
+                        STT: stt,
+                        RoleId: role,
+                    })
+                });
+                const responsedata = await response.json();
+                if (response.ok) {
+                    $("#myTable").DataTable().page(currentPage).page.len(pageLength).draw(false);
+                }
+                bootstrapModal.hide();
+                toast.show();
+            } catch (error) {
+                console.log('lỗi:', error);
+            }
+        }
+    </script>
+</body>
+</html>
